@@ -18,72 +18,117 @@ const waysToMoveArr = [
 // ============================================== major funcs ============================================== //
 
 export function findShortestPath(startCoords, endCoords, pathLog = []) {
-  //if endCoords not in possMoves, run again on all,
-  //should always end on the first possible move
-  //may have to compare the recursively returned moveListArr.length and take shortest(s)
-
   //test
-  //   console.log(pathLog);
+  // console.log("=========================");
+  // console.log(startCoords);
+  // console.log(endCoords);
 
   //log the current jump
   pathLog.push(startCoords);
+
   //base case: match
-  if (startCoords === endCoords) {
+  //can't do array === array
+  if (startCoords[0] === endCoords[0] && startCoords[1] === endCoords[1]) {
     console.log("match");
+    // console.table(pathLog);
     return pathLog;
   }
 
-  //endCoords[0] tells which nested array in adjacenyPossMoves to look at. Looks if that array contains a link to the endCoords second coordinate
-  //   if (adjacenyPossMoves[endCoords[0]].includes(endCoords[1])) {
-  //     console.log("match");
-  //     return pathLog;
-  //   }
+  //need pass all prevCoords so they are not included in the next set of possMoves, else can get a infinite loop back and forth with two of the same moves
+  //need check for paths that "trap" themselves also
+  const possMoves = findPossibleMoves(startCoords, pathLog);
 
-  //else recursive call on all possible moves
-  const possMoves = findPossibleMoves(startCoords);
-  //   const adjacenyPossMoves = convertToAdjacencyList(possMoves);
+  //test
+  // console.log(possMoves);
 
-  //   findShortestPath(possMoves[0], endCoords, pathLog);
+  //test
+  // console.log("=========================");
+  // console.log(possMoves);
 
-  //getting a loop stuck between two moves, back and forth: need run check for no previous move?
+  //if did not match and out of moves, means path traps itself
+  if (possMoves.length === 0) return null;
+
+  let shortestPath;
+
+  //else, recursive call on all possible moves
   possMoves.forEach((move) => {
-    findShortestPath(move, endCoords, pathLog);
+    const tempShortestPath = findShortestPath(move, endCoords, pathLog);
+
+    //if pathLog no return null
+    if (tempShortestPath) {
+    }
+
+    //if shortestPath is still in init, overwrite
+    if (!shortestPath) {
+      shortestPath = tempShortestPath;
+    }
+
+    if (tempShortestPath && tempShortestPath.length < shortestPath) {
+      shortestPath = tempShortestPath;
+    }
   });
+
+  return;
+
+  //will have to compare the returned paths and add up moves(like BST height)
 }
 
 // ============================================== lessor funcs ============================================== //
 
 //return adjacency list of all valid moves from input coords
-function findPossibleMoves(startCoords) {
-  let possibleMovesArr = [];
+function findPossibleMoves(startCoords, pathLog) {
+  const movesOnBoard = getMovesOnBoard(startCoords);
+  const nonRepeatMoves = removePrevCoords(movesOnBoard, pathLog);
+
+  return nonRepeatMoves;
+}
+
+//returns all possible moves, minus those off the board
+function getMovesOnBoard(startCoords) {
+  let movesOnBoard = [];
 
   waysToMoveArr.forEach((move) => {
-    //grab all possible moves and see which are on on the board
-    //board is 8x8 (#'s 0-7)
+    //calc each move
     const pontentialMove = [startCoords[0] - move[0], startCoords[1] - move[1]];
+
+    //check for within bounds (board is 8x8 (#'s 0-7))
     if (
       pontentialMove[0] >= 0 &&
       pontentialMove[0] <= 7 &&
       pontentialMove[1] >= 0 &&
       pontentialMove[1] <= 7
     ) {
-      possibleMovesArr.push(pontentialMove);
+      movesOnBoard.push(pontentialMove);
     }
   });
 
-  return possibleMovesArr;
+  return movesOnBoard;
+}
+
+function removePrevCoords(movesOnBoard, pathLog) {
+  const adjacencyPathLog = convertToAdjacencyList(pathLog);
+  const nonPrevMoves = [];
+
+  movesOnBoard.forEach((move) => {
+    //if array ind
+    // if (adjacencyPathLog[move[0]]) {
+    // }
+
+    if (!adjacencyPathLog[move[0]].includes(move[1])) nonPrevMoves.push(move);
+  });
+
+  return nonPrevMoves;
 }
 
 //is this really needed?
-//i cant find a place for it, seem to make things more complicated
-function convertToAdjacencyList(possibleMovesArr) {
+function convertToAdjacencyList(movesArr) {
   //will be an array of arrays
   let adjacencyList = [];
   //board vertices are 0 - 7
   for (let i = 0; i <= 7; i++) {
     //nested array for each column on board (column # = i), add j value (row value) here
     let tempArr = [];
-    possibleMovesArr.forEach((move) => {
+    movesArr.forEach((move) => {
       if (move[0] === i) tempArr.push(move[1]);
     });
     adjacencyList.push(tempArr);
@@ -94,4 +139,5 @@ function convertToAdjacencyList(possibleMovesArr) {
 
 // ============================================== testing ============================================== //
 
+console.log("========================= new =========================");
 console.log(findShortestPath([3, 3], [4, 5]));

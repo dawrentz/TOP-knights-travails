@@ -11,4 +11,7 @@ todo:
     idea:
         - store all possible paths in array, the loop through for shortest
 
+        -may try writing agian, but starting from end point and branching (with reverse jumps)
+            -use a root to have a parent node prop (point back prop), use that as the path log
+
  -->

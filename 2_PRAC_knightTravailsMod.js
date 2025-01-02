@@ -4,8 +4,17 @@
 
 console.clear();
 
-//testing with a 3x2 rectangle (4 paths)
-//can only move up, down, left, or right by 1
+// const waysToMoveArr = [
+//   [-2, -1],
+//   [-2, 1],
+//   [-1, -2],
+//   [-1, 2],
+//   [1, -2],
+//   [1, 2],
+//   [2, -1],
+//   [2, 1],
+// ];
+
 const waysToMoveArr = [
   [-1, 0],
   [1, 0],
@@ -13,63 +22,72 @@ const waysToMoveArr = [
   [0, 1],
 ];
 
+const numColumns = 2;
+const numRows = 2;
+
 // ============================================== major funcs ============================================== //
 
-export function findShortestPath(startCoords, endCoords, pathLog = []) {
-  //update pathLog
-  pathLog.push(startCoords);
+function Square(coords, pathLogArg = []) {
+  //pathLof array was being updated in the deeper recursion calls
+  const pathLog = [...pathLogArg];
+  pathLog.push(coords);
 
-  //test
-  // console.log("startCoords");
-  // console.log(startCoords);
-  // console.log("pathLog");
-  // console.log(pathLog);
-
-  //base case: match
-  if (startCoords[0] === endCoords[0] && startCoords[1] === endCoords[1]) {
-    //test
-    // console.log("match");
-
-    return pathLog;
-  }
-
-  //else recursion
-  //base case: path traps itself
-  const possMoves = findPossibleMoves(startCoords, pathLog);
-  if (possMoves.length === 0) return null;
-
-  //test
-  console.log("possMoves");
-  console.log(possMoves);
-
-  let allPaths = [];
+  const possMoves = findPossibleMoves(coords, pathLog);
+  const possSquares = [];
 
   possMoves.forEach((move) => {
-    //not shortest path, just all paths, then return shortest?
-    const tempPath = findShortestPath(move, endCoords, pathLog);
-
     //test
-    // console.log("move");
+    // console.log("======================");
     // console.log(move);
-    // console.log(path);
+    // console.log(pathLog);
+    const square = Square(move, pathLog);
 
-    if (tempPath) {
-      allPaths.push(tempPath);
-    }
+    possSquares.push(square);
   });
 
-  console.log("allPaths");
-  console.log(allPaths);
+  return {
+    coords,
+    possSquares,
+    pathLog,
+  };
+}
 
-  return allPaths;
+class PathsSet {
+  constructor(startCoords) {
+    this.root = Square(startCoords);
+  }
+
+  //now build finders and sorters
+
+  collectPathsToEnd(endCoords, square = this.root, allPaths = []) {
+    if (
+      square.coords[0] === endCoords[0] &&
+      square.coords[1] === endCoords[1]
+    ) {
+      allPaths.push(square.pathLog);
+    } else {
+      square.possSquares.forEach((square) => {
+        this.collectPathsToEnd(endCoords, square, allPaths);
+      });
+    }
+
+    return allPaths;
+  }
 }
 
 // ============================================== lessor funcs ============================================== //
+
+// function getPathLog(square)
 
 function findPossibleMoves(startCoords, pathLog) {
   const potentialMoves = getPotentialMoves(startCoords);
   const onBoardMoves = removeOutOfBoundsMoves(potentialMoves);
   const possMoves = removePrevCoords(onBoardMoves, pathLog);
+
+  // console.log("========================");
+  // console.log(startCoords);
+  // console.log(pathLog);
+  // console.log(possMoves);
 
   return possMoves;
 }
@@ -91,7 +109,12 @@ function removeOutOfBoundsMoves(potentialMoves) {
   potentialMoves.forEach((move) => {
     //move[0] = x-coord
     //move[1] = y-coord
-    if (move[0] >= 0 && move[0] <= 2 && move[1] >= 0 && move[1] <= 1) {
+    if (
+      move[0] >= 0 &&
+      move[0] <= numColumns - 1 &&
+      move[1] >= 0 &&
+      move[1] <= numRows - 1
+    ) {
       onBoardMoves.push(move);
     }
   });
@@ -118,8 +141,6 @@ function removePrevCoords(onBoardMoves, pathLog) {
 
 function createAdjacencyList(coordArr) {
   let adjacencyList = [];
-  //x-value range
-  const numColumns = 3;
 
   //conver to index with -1
   for (let i = 0; i <= numColumns - 1; i++) {
@@ -138,7 +159,10 @@ function createAdjacencyList(coordArr) {
 // ============================================== testing ============================================== //
 
 console.log("========================= new =========================");
-console.table(findShortestPath([0, 0], [2, 1]));
+const allPaths = new PathsSet([0, 0]);
+
+console.log(allPaths.root);
+console.log(allPaths.collectPathsToEnd([1, 1]));
 
 //test
 // const testStart = [1, 1];

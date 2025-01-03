@@ -14,4 +14,13 @@ todo:
         -may try writing agian, but starting from end point and branching (with reverse jumps)
             -use a root to have a parent node prop (point back prop), use that as the path log
 
+
+    update:
+        -can't create all paths, too computationally expensize, crashes
+            -think ill need to:
+                -run possMoves and check for endpont each time
+                -if no match, run possMoves on all possMoves and check again
+                -may be good to just have the pointback prop (less mem)
+
+
  -->

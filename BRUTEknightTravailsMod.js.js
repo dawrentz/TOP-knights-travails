@@ -1,5 +1,9 @@
 //knightTravailsMod.js
 
+// ============================================== note ============================================== //
+
+//this depth-first method works but uses too much memory. need breadth-first (automatically finds shortest path(s))
+
 // ============================================== init ============================================== //
 
 console.clear();
@@ -22,8 +26,8 @@ const waysToMoveArr = [
   [0, 1],
 ];
 
-const numColumns = 2;
-const numRows = 2;
+const numColumns = 3;
+const numRows = 3;
 
 // ============================================== major funcs ============================================== //
 
@@ -162,7 +166,8 @@ console.log("========================= new =========================");
 const allPaths = new PathsSet([0, 0]);
 
 console.log(allPaths.root);
-console.log(allPaths.collectPathsToEnd([1, 1]));
+
+console.log(allPaths.collectPathsToEnd([2, 1]));
 
 //test
 // const testStart = [1, 1];

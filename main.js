@@ -6,7 +6,7 @@ import * as knightTravailsMod from "./knightTravailsMod.js";
 
 // ============================================== testing ============================================== //
 
-const testStart = [3, 3];
-const testEnd = [4, 3];
+const testStart = [0, 0];
+const testEnd = [1, 1];
 
 knightTravailsMod.knightMoves(testStart, testEnd);

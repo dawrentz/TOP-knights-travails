@@ -3,6 +3,7 @@
 // ============================================== note ============================================== //
 
 //this depth-first method works but uses too much memory. need breadth-first (automatically finds shortest path(s))
+//abandoning
 
 // ============================================== init ============================================== //
 
